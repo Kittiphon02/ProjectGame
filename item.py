@@ -1,21 +1,24 @@
-from turtle import Turtle
+# item.py
+
+import pygame
 import random
 
-class Item(Turtle):
+class Item:
     def __init__(self):
-        super().__init__()
-        self.shape("circle")
-        self.color("blue")
-        self.penup()
-        self.speed("fastest")
-        self.move_speed = 5
-        self.refresh()
+        # Create a Pygame Surface for the item (e.g., a 20x20 square)
+        self.image = pygame.Surface((20, 20))  # You can also load an image file here
+        self.image.fill((255, 0, 0))  # Red color for visibility
 
-    def refresh(self):
-        """สุ่มตำแหน่งเริ่มต้นของไอเท็มด้านขวาของหน้าจอ"""
-        random_y = random.randint(-250, 250)
-        self.goto(300, random_y)
+        # Set the initial position randomly
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(600, 800)  # Start off-screen on the right
+        self.rect.y = random.randint(0, 580)
 
     def move_item(self):
-        """เคลื่อนที่ไอเท็มจากขวาไปซ้าย"""
-        self.setx(self.xcor() - self.move_speed)
+        # Move the item leftward across the screen
+        self.rect.x -= 5  # Adjust speed as needed
+
+    def refresh(self):
+        # Reset the item’s position off-screen to the right
+        self.rect.x = random.randint(600, 800)
+        self.rect.y = random.randint(0, 580)

@@ -1,33 +1,26 @@
-from turtle import Turtle
+# scoreboard.py
+import pygame
 
-class Scoreboard(Turtle):
+class Scoreboard:
     def __init__(self):
-        super().__init__()
         self.score = 0
-        self.hideturtle()
-        self.penup()
-        self.color("black")
-        self.goto(0, 270)  # กำหนดให้คะแนนอยู่ด้านบนระหว่างเล่น
-        self.update_scoreboard()
-
-    def update_scoreboard(self):
-        self.clear()
-        self.goto(0, 270)  # ให้คะแนนอัปเดตที่ด้านบน
-        self.write(f"Score: {self.score}", align="center", font=("Arial", 24, "normal"))
+        self.level = 1
 
     def increase_level(self):
         self.score += 1
-        self.update_scoreboard()
+
+    def display_score(self, screen):
+        font = pygame.font.Font(None, 36)
+        score_text = font.render(f"Score: {self.score}", True, (255, 255, 255))
+        screen.blit(score_text, (10, 10))
 
     def game_over(self):
-        self.goto(0, 0)
-        self.write("Game Over", align="center", font=("Arial", 24, "normal"))
+        font = pygame.font.Font(None, 48)
+        game_over_text = font.render("Game Over", True, (255, 0, 0))
+        screen = pygame.display.get_surface()  # Get the main display screen
+        screen.blit(game_over_text, (200, 250))
 
-    def reset(self):
+    def reset_score(self):
+        """Reset the score to 0 for a new game."""
         self.score = 0
-        self.update_scoreboard()
-
-    # ฟังก์ชันแสดงท็อปสกอร์หลังจบเกมที่ด้านล่าง
-    def display_top_score(self, text, y_position):
-        self.goto(0, y_position)
-        self.write(text, align="center", font=("Arial", 18, "normal"))
+        self.level = 1

@@ -1,24 +1,18 @@
-from turtle import Turtle
+import pygame
 
-STARTING_POSITION = (0, -280)
-MOVE_DISTANCE = 10
-FINISH_LINE_Y = 280
-
-class Player(Turtle):
+class Player:
     def __init__(self):
-        super().__init__()
-        self.shape("turtle")
-        self.penup()
-        self.setheading(90)  # ตั้งให้เต่าหันหน้าไปด้านบน
-        self.go_to_start()
+        # โหลดรูปภาพเต๋าสำหรับตัวผู้เล่น
+        self.image = pygame.image.load("bttt.png")  # สมมุติว่าชื่อไฟล์คือ dice.png
+        self.image = pygame.transform.scale(self.image, (40, 40))  # ปรับขนาดเป็น 40x40
+        self.rect = self.image.get_rect()
+        self.rect.x, self.rect.y = 300, 580  # ตำแหน่งเริ่มต้นของผู้เล่น
 
     def go_up(self):
-        print("Moving up")  # ตรวจสอบการเคลื่อนไหว
-        self.forward(MOVE_DISTANCE)  # เคลื่อนที่ไปข้างหน้าในทิศทางด้านบน
-
-    def is_at_finish_line(self):
-        return self.ycor() > FINISH_LINE_Y
+        self.rect.y -= 20
 
     def go_to_start(self):
-        self.goto(STARTING_POSITION)
-        self.setheading(90)  # ตั้งให้หันไปทางด้านบนเมื่อเริ่มใหม่
+        self.rect.y = 580  # รีเซ็ตตำแหน่งเมื่อกลับไปเริ่มต้น
+
+    def is_at_finish_line(self):
+        return self.rect.y <= 0
