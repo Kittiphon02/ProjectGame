@@ -5,6 +5,7 @@ from player import Player
 from car_manager import CarManager
 from scoreboard import Scoreboard
 from item import Item
+from food import Food  # เพิ่มการ import คลาส Food
 
 # Initialize Pygame
 pygame.init()
@@ -26,7 +27,8 @@ death_effect_img = pygame.transform.scale(death_effect_img, (60, 60))  # Adjust 
 player = Player()
 car_manager = CarManager()
 scoreboard = Scoreboard()
-items = [Item() for _ in range(5)]
+items = [Item() for _ in range(5)]  # สร้างไอเท็มหลายชิ้น
+foods = [Food() for _ in range(3)]  # สร้างอาหาร 3 ชิ้น
 
 # Game state variables
 game_is_on = True
@@ -62,6 +64,12 @@ while True:
             if event.key == pygame.K_UP and game_is_on:
                 jump_sound.play()
                 player.go_up()
+            elif event.key == pygame.K_DOWN and game_is_on:
+                player.go_down()
+            elif event.key == pygame.K_LEFT and game_is_on:
+                player.go_left()
+            elif event.key == pygame.K_RIGHT and game_is_on:
+                player.go_right()
             elif event.key == pygame.K_g and not game_is_on:  # 'G' to restart
                 reset_game()
 
@@ -95,6 +103,20 @@ while True:
             if item.rect.left < 0:
                 item.refresh()
         
+        # Handle food items
+        for food in foods:
+            food.move_food()  # Move each food item leftward
+            screen.blit(food.image, food.rect)  # Draw the food on the screen
+
+            # Check for food collection
+            if player.rect.colliderect(food.rect):
+                food.refresh()  # Reset food position
+                scoreboard.increase_score(10)  # เพิ่มคะแนนให้ผู้เล่นเมื่อเก็บอาหารได้
+            
+            # If food goes off-screen, reset its position
+            if food.rect.left < 0:
+                food.refresh()
+        
         # Collision detection for cars
         for car_surface, car_rect in car_manager.all_cars:
             if car_rect.colliderect(player.rect):
@@ -121,15 +143,32 @@ while True:
             screen.blit(death_effect_img, player.rect)
         else:
             # After effect ends, display game over screen
+          
+            # After effect ends, display game over screen
             game_is_on = False
             font = pygame.font.Font(None, 36)
+
+            # Display current score and highest score
             score_text = font.render(f"Your Score: {scoreboard.score}", True, (255, 255, 255))
-            high_score_text = font.render(f"Highest Score: {highest_score}", True, (255, 255, 0))
+            high_score_text = font.render(f"Highest Score: {scoreboard.highest_score}", True, (255, 255, 0))
+
+            # Display current level and highest level
+            level_text = font.render(f"Level Reached: {scoreboard.level}", True, (255, 255, 255))
+            high_level_text = font.render(f"Highest Level: {scoreboard.highest_level}", True, (255, 255, 0))
+
+            # Display restart instruction
             go_text = font.render("Press 'G' to Go Again", True, (255, 0, 0))
-            screen.blit(score_text, (200, 200))
-            screen.blit(high_score_text, (200, 250))
-            screen.blit(go_text, (200, 300))
+
+            # Blit texts to the screen
+            screen.blit(score_text, (200, 150))
+            screen.blit(high_score_text, (200, 200))
+            screen.blit(level_text, (200, 250))
+            screen.blit(high_level_text, (200, 300))
+            screen.blit(go_text, (200, 350))
+
+            # Update display
             pygame.display.flip()
+
 
             # Wait for 'G' key to restart
             waiting_for_restart = True
@@ -141,6 +180,17 @@ while True:
                     elif event.type == pygame.KEYDOWN and event.key == pygame.K_g:
                         waiting_for_restart = False
                         reset_game()
+                        # Main game loop changes
+
+    if not game_is_on and death_effect_active:
+        # Display death effect and show game over screen after effect duration
+        if time.time() - death_effect_start_time < effect_duration:
+            screen.blit(death_effect_img, player.rect)
+        else:
+            # Display game over and score
+            scoreboard.game_over(screen)
+            pygame.display.flip()
+
 
     # Draw cars on the screen
     for car_surface, car_rect in car_manager.all_cars:
